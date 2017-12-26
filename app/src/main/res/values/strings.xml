@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">VideoDemo</string>
+    <string name="copyright">author:yanjingw E-mail:yanjingw.calm@gmail.com</string>
+    <string name="description">音视频学习</string>
 </resources>
