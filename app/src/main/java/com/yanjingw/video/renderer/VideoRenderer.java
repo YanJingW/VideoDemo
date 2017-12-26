@@ -7,7 +7,6 @@
 package com.yanjingw.video.renderer;
 
 import android.content.Context;
-import android.graphics.SurfaceTexture;
 import android.view.SurfaceHolder;
 
 import com.yanjingw.video.util.LogUtil;
@@ -18,15 +17,15 @@ import com.yanjingw.video.util.LogUtil;
 public class VideoRenderer {
 
     private Context mContext;
-    private SurfaceHolder mSurfaceHolder;
-    private String mVideoPath;
+    private final MyMediaPlayer myMediaPlayer;
 
 
     public VideoRenderer(Context context, SurfaceHolder surfaceHolder, String videoPath) {
         mContext = context;
-        mSurfaceHolder = surfaceHolder;
+        SurfaceHolder mSurfaceHolder = surfaceHolder;
         mSurfaceHolder.addCallback(mSurfaceHolderCallback);
-        mVideoPath = videoPath;
+        myMediaPlayer = new MyMediaPlayer(mSurfaceHolder);
+        myMediaPlayer.setVideoPath(videoPath);
     }
 
     private SurfaceHolder.Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
@@ -34,17 +33,25 @@ public class VideoRenderer {
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
             LogUtil.i("surfaceDestroyed");
+
+            // 销毁SurfaceHolder的时候记录当前的播放位置并停止播放
+            myMediaPlayer.stop();
+
+
         }
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             LogUtil.i("surfaceCreated");
+
+            myMediaPlayer.play();
         }
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             LogUtil.i("surfaceChanged");
         }
+
     };
 
 }
