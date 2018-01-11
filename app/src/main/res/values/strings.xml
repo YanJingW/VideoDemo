@@ -2,4 +2,6 @@
     <string name="app_name">VideoDemo</string>
     <string name="copyright">author:yanjingw E-mail:yanjingw.calm@gmail.com</string>
     <string name="description">音视频学习</string>
+    <string name="demo1">surfaceview+mediaplayer播放视频</string>
+    <string name="demo2">textureview+surfacetexture+opengl来播放视频</string>
 </resources>

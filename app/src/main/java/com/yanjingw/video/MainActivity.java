@@ -13,7 +13,8 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
-    File ads = new File(FileUtils.ROOT, "demo1.MP4");
+    File demo1File = new File(FileUtils.ROOT, "demo1.MP4");
+    File demo2File = new File(FileUtils.ROOT, "demo1.MP4");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +25,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initView() {
-        Button tv_demo1 = findViewById(R.id.demo1);
-        tv_demo1.setOnClickListener(this);
+        Button bu_demo1 = findViewById(R.id.demo1);
+        bu_demo1.setOnClickListener(this);
+        Button bu_demo2 = findViewById(R.id.demo2);
+        bu_demo2.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.demo1:
-                if (ads.exists()) {
+                if (demo1File.exists()) {
                     //文件存在
-                    Demo1Activity.startActivity(MainActivity.this, ads.getAbsolutePath());
+                    Demo1Activity.startActivity(MainActivity.this, demo1File.getAbsolutePath());
+                } else {
+                    //文件不存在
+                    Toast.makeText(MainActivity.this, "示例文件不存在", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case R.id.demo2:
+                if (demo2File.exists()) {
+                    //文件存在
+                    Demo2Activity.startActivity(MainActivity.this, demo2File.getAbsolutePath());
                 } else {
                     //文件不存在
                     Toast.makeText(MainActivity.this, "示例文件不存在", Toast.LENGTH_SHORT).show();
