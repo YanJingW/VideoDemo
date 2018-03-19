@@ -12,7 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.yanjingw.video.renderer.MyMediaPlayer;
+import com.yanjingw.video.renderer.QhMediaPlayer;
 import com.yanjingw.video.util.LogUtil;
 import com.yanjingw.video.view.VideoSurfaceView;
 
@@ -30,8 +30,12 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
      * 3、SurfaceView在底层实现了一个双缓冲机制，效率大大提升。
      */
     private VideoSurfaceView mSurfaceView;
-    private MyMediaPlayer myMediaPlayer;
+    private QhMediaPlayer qhMediaPlayer;
     private Activity activity;
+    private String videoPath;
+
+    //标记暂停和播放状态
+    private boolean isPlaying = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +45,7 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
         setContentView(R.layout.activity_demo1);
         activity = Demo1Activity.this;
 
-        String videoPath = getIntent().getStringExtra(VIDEO_PATH);
+        videoPath = getIntent().getStringExtra(VIDEO_PATH);
 
         if (TextUtils.isEmpty(videoPath)) {
             return;
@@ -52,22 +56,8 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
 
         SurfaceHolder mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(mSurfaceHolderCallback);
-        myMediaPlayer = new MyMediaPlayer(mSurfaceHolder);
-        myMediaPlayer.setVideoPath(videoPath);
-        myMediaPlayer.setOnPreparedListener(new MyMediaPlayer.OnPreparedListener() {
 
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-
-                if (myMediaPlayer == null) {
-                    return;
-                }
-                //适配视频的高度
-                int videoWidth = myMediaPlayer.getVideoWidth();
-                int videoHeight = myMediaPlayer.getVideoHeight();
-                mSurfaceView.fitVideoSize(videoWidth, videoHeight);
-            }
-        });
+        qhMediaPlayer = new QhMediaPlayer();
     }
 
 
@@ -78,16 +68,37 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
             LogUtil.i("surfaceDestroyed");
 
             // 销毁SurfaceHolder的时候记录当前的播放位置并停止播放
-            myMediaPlayer.stop();
-
-
+//            myMediaPlayer.stop();
+            //保存播放位置
+            if (qhMediaPlayer != null) {
+                qhMediaPlayer.pause();
+            }
         }
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             LogUtil.i("surfaceCreated");
+            qhMediaPlayer.createMediaPlayer(holder);
+            qhMediaPlayer.setVideoPath(videoPath);
+            qhMediaPlayer.setOnCompletionListener(new QhMediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer var1) {
 
-            myMediaPlayer.play();
+                }
+            });
+            qhMediaPlayer.setOnAfterStartListener(new QhMediaPlayer.OnAfterStartListener() {
+                @Override
+                public void onAfterStart(MediaPlayer mp) {
+                    if (qhMediaPlayer == null) {
+                        return;
+                    }
+                    //适配视频的高度
+                    int videoWidth = qhMediaPlayer.getVideoWidth();
+                    int videoHeight = qhMediaPlayer.getVideoHeight();
+                    mSurfaceView.fitVideoSize(videoWidth, videoHeight);
+                }
+            });
+            qhMediaPlayer.play();
         }
 
         @Override
@@ -104,12 +115,12 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
         super.onConfigurationChanged(newConfig);
         LogUtil.i("onConfigurationChanged");
 
-        if (myMediaPlayer == null) {
+        if (qhMediaPlayer == null) {
             return;
         }
         //适配视频的高度
-        int videoWidth = myMediaPlayer.getVideoWidth();
-        int videoHeight = myMediaPlayer.getVideoHeight();
+        int videoWidth = qhMediaPlayer.getVideoWidth();
+        int videoHeight = qhMediaPlayer.getVideoHeight();
         mSurfaceView.updateLayout(newConfig, videoWidth, videoHeight);
     }
 
