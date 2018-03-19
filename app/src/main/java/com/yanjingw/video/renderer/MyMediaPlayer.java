@@ -15,6 +15,7 @@ public class MyMediaPlayer {
     private MediaPlayer mMediaPlayer;
     private final SurfaceHolder mSurfaceHolder;
     private String videoPath;
+    private OnPreparedListener onMyPreparedListener;
 
     public MyMediaPlayer(SurfaceHolder mSurfaceHolder) {
         super();
@@ -50,6 +51,7 @@ public class MyMediaPlayer {
                 public void onPrepared(MediaPlayer mp) {
                     LogUtil.i("mMediaPlayer-装载完成");
                     mMediaPlayer.start();
+                    onMyPreparedListener.onPrepared(mp);
                 }
             });
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -75,4 +77,20 @@ public class MyMediaPlayer {
         }
     }
 
+    // TODO: 2018/3/19 在什么时候此方法生效
+    public int getVideoWidth() {
+        return mMediaPlayer.getVideoWidth();
+    }
+
+    public int getVideoHeight() {
+        return mMediaPlayer.getVideoHeight();
+    }
+
+    public void setOnPreparedListener(OnPreparedListener onPreparedListener) {
+        this.onMyPreparedListener = onPreparedListener;
+    }
+
+    public interface OnPreparedListener {
+        void onPrepared(MediaPlayer var1);
+    }
 }
