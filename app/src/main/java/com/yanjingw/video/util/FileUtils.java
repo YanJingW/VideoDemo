@@ -22,7 +22,7 @@ public class FileUtils {
     public static void copyFiles(Context context) {
         File ads = new File(ROOT);
         if (!ads.exists()) {
-            ads.mkdir();
+            ads.mkdirs();
         }
 
         String assetsInPath = ASSETS_PATH;
