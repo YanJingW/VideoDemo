@@ -15,7 +15,7 @@ import static android.content.ContentValues.TAG;
  * Created by wangyanjing on 2018/3/19.
  */
 
-public class VideoSurfaceView extends SurfaceView {
+public class PreviewVideoView extends SurfaceView {
 
 
     //默认宽高比16:9
@@ -27,15 +27,15 @@ public class VideoSurfaceView extends SurfaceView {
     private int playerViewW;
     private int playerViewH;
 
-    public VideoSurfaceView(Context context) {
+    public PreviewVideoView(Context context) {
         super(context);
     }
 
-    public VideoSurfaceView(Context context, AttributeSet attrs) {
+    public PreviewVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public VideoSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PreviewVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

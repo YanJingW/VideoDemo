@@ -12,16 +12,16 @@ import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.yanjingw.video.renderer.QhMediaPlayer;
+import com.yanjingw.video.inter.PreviewPlayer;
 import com.yanjingw.video.util.LogUtils;
-import com.yanjingw.video.view.VideoSurfaceView;
+import com.yanjingw.video.view.PreviewVideoView;
 import com.yanjingw.video.view.ViewController;
 
 /**
  * 使用SurfaceView播放一个视频流媒体。
  * 参考博客：http://www.cnblogs.com/plokmju/p/android_SurfaceView.html
  */
-public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeChangedListener {
+public class Demo1Activity extends Activity {
 
     public static final String VIDEO_PATH = "video_path";
 
@@ -30,8 +30,8 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
      * 2、SurfaceView的绘制在子线程进行，避免了UI线程的阻塞。
      * 3、SurfaceView在底层实现了一个双缓冲机制，效率大大提升。
      */
-    private VideoSurfaceView mSurfaceView;
-    private QhMediaPlayer qhMediaPlayer;
+    private PreviewVideoView mSurfaceView;
+    private PreviewPlayer previewPlayer;
     private Activity activity;
     private String videoPath;
 
@@ -60,10 +60,10 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
         SurfaceHolder mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(mSurfaceHolderCallback);
 
-        qhMediaPlayer = new QhMediaPlayer();
+        previewPlayer = new PreviewPlayer();
 
         mViewController = findViewById(R.id.view_controller);
-        mViewController.setVideoPlayer(qhMediaPlayer);
+        mViewController.setVideoPlayer(previewPlayer);
     }
 
 
@@ -76,8 +76,8 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
             // 销毁SurfaceHolder的时候记录当前的播放位置并停止播放
 //            myMediaPlayer.stop();
             //保存播放位置
-            if (qhMediaPlayer != null) {
-                qhMediaPlayer.pause();
+            if (previewPlayer != null) {
+                previewPlayer.pause();
             }
             mViewController.pause();
         }
@@ -86,27 +86,27 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
         public void surfaceCreated(SurfaceHolder holder) {
             LogUtils.i("surfaceCreated");
 
-            qhMediaPlayer.createMediaPlayer(holder);
-            qhMediaPlayer.setOnCompletionListener(new QhMediaPlayer.OnCompletionListener() {
+            previewPlayer.createMediaPlayer(holder);
+            previewPlayer.setOnCompletionListener(new PreviewPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer var1) {
                     mViewController.pause();
                 }
             });
-            qhMediaPlayer.setOnAfterStartListener(new QhMediaPlayer.OnAfterStartListener() {
+            previewPlayer.setOnAfterStartListener(new PreviewPlayer.OnAfterStartListener() {
                 @Override
                 public void onAfterStart(MediaPlayer mp) {
-                    if (qhMediaPlayer == null) {
+                    if (previewPlayer == null) {
                         return;
                     }
                     //适配视频的高度
-                    int videoWidth = qhMediaPlayer.getVideoWidth();
-                    int videoHeight = qhMediaPlayer.getVideoHeight();
+                    int videoWidth = previewPlayer.getVideoWidth();
+                    int videoHeight = previewPlayer.getVideoHeight();
                     mSurfaceView.fitVideoSize(videoWidth, videoHeight);
                     mViewController.fitVideoSize(videoWidth, videoHeight);
                 }
             });
-            qhMediaPlayer.setDataSource(videoPath);
+            previewPlayer.setDataSource(videoPath);
         }
 
         @Override
@@ -123,18 +123,13 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
         super.onConfigurationChanged(newConfig);
         LogUtils.i("onConfigurationChanged");
 
-        if (qhMediaPlayer == null) {
+        if (previewPlayer == null) {
             return;
         }
         //适配视频的高度
-        int videoWidth = qhMediaPlayer.getVideoWidth();
-        int videoHeight = qhMediaPlayer.getVideoHeight();
+        int videoWidth = previewPlayer.getVideoWidth();
+        int videoHeight = previewPlayer.getVideoHeight();
         mSurfaceView.updateLayout(newConfig, videoWidth, videoHeight);
-    }
-
-    @Override
-    public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
-        LogUtils.i("onVideoSizeChanged:::::::");
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.yanjingw.video.renderer;
+package com.yanjingw.video.inter;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -6,14 +6,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.SurfaceHolder;
 
-import com.yanjingw.video.inter.Player;
 import com.yanjingw.video.util.LogUtils;
 
 /**
  * Created by wangyanjing on 2017/12/26.
  */
 
-public class QhMediaPlayer extends Player {
+public class PreviewPlayer extends Player {
 
     private SurfaceHolder mSurfaceHolder;
     private String videoPath;
@@ -34,7 +33,7 @@ public class QhMediaPlayer extends Player {
      */
     private int mLastVideoPosition = 0;
 
-    public QhMediaPlayer() {
+    public PreviewPlayer() {
 //        super();
     }
 
