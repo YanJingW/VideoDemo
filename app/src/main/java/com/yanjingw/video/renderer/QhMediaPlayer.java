@@ -6,15 +6,15 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.SurfaceHolder;
 
-import com.yanjingw.video.util.LogUtil;
+import com.yanjingw.video.inter.Player;
+import com.yanjingw.video.util.LogUtils;
 
 /**
  * Created by wangyanjing on 2017/12/26.
  */
 
-public class QhMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener {
+public class QhMediaPlayer extends Player {
 
-    private MediaPlayer mMediaPlayer;
     private SurfaceHolder mSurfaceHolder;
     private String videoPath;
     private OnAfterStartListener onAfterStartListener;
@@ -32,10 +32,10 @@ public class QhMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPla
     /**
      * 最后一次视频播放的位置
      */
-    private int mLastVideoPosition;
+    private int mLastVideoPosition = 0;
 
     public QhMediaPlayer() {
-        super();
+//        super();
     }
 
     public void createMediaPlayer(SurfaceHolder holder) {
@@ -43,48 +43,21 @@ public class QhMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPla
         this.mSurfaceHolder = holder;
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-    }
-
-    public void setVideoPath(String videoPath) {
-        this.videoPath = videoPath;
-    }
-
-    /**
-     * 记录当前的播放位置并停止播放
-     */
-    public void stop() {
-        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-            mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
+//        mMediaPlayer.setLooping(true);//重复播放
+        mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnPreparedListener(this);
+        mMediaPlayer.setOnErrorListener(this);
+        mMediaPlayer.setDisplay(holder);
     }
 
     /**
      * 暂停播放
      */
     public void pause() {
-        if (mMediaPlayer!=null) {
-            mToPlay = true;
+        if (mMediaPlayer != null) {
+            mToPlay = false;
             mMediaPlayer.pause();
             mLastVideoPosition = mMediaPlayer.getCurrentPosition();
-        }
-    }
-
-    /**
-     * 开始播放视频
-     */
-    public void play() {
-        try {
-            mMediaPlayer.setDisplay(mSurfaceHolder);
-            mMediaPlayer.setDataSource(videoPath);
-            mMediaPlayer.prepareAsync();
-            mMediaPlayer.setLooping(true);//重复播放
-            mMediaPlayer.setOnCompletionListener(this);
-            mMediaPlayer.setOnPreparedListener(this);
-            mMediaPlayer.setOnErrorListener(this);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -101,28 +74,35 @@ public class QhMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPla
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         mToPlay = false;
+        //跳到视频最开始位置
+        mLastVideoPosition = 0;
+        mMediaPlayer.seekTo(mLastVideoPosition);
         onMyCompletionListener.onCompletion(mediaPlayer);
     }
 
     public void onPrepared(MediaPlayer mediaPlayer) {
-        LogUtil.i("mMediaPlayer-装载完成");
-        mediaPlayer.start();
+        super.onPrepared(mediaPlayer);
+        LogUtils.i("mMediaPlayer-装载完成");
+//        play();
         //是否开始播放
-        if (!mToPlay) {
-            mediaPlayer.pause();
-        } else {
-        }
-        //延时：避免出现上一个视频的画面闪屏
-        myHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //跳转指定位置
-                if (mLastVideoPosition > 0) {
-                    mMediaPlayer.seekTo(mLastVideoPosition);
-                    mLastVideoPosition = 0;
-                }
-            }
-        }, 0);
+//        if (!mToPlay) {
+//            pause();
+//        } else {
+//        }
+        mMediaPlayer.seekTo(mLastVideoPosition);
+        mLastVideoPosition = 0;
+
+//        //延时：避免出现上一个视频的画面闪屏
+//        myHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                //跳转指定位置
+//                if (mLastVideoPosition > 0) {
+//                    mMediaPlayer.seekTo(mLastVideoPosition);
+//                    mLastVideoPosition = 0;
+//                }
+//            }
+//        }, 0);
 
         onAfterStartListener.onAfterStart(mediaPlayer);
     }
@@ -130,7 +110,8 @@ public class QhMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPla
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         // 发生错误重新播放
-        LogUtil.i("onError::::" + what + "--" + extra);
+        super.onError(mp, what, extra);
+        LogUtils.i("onError::::" + what + "--" + extra);
         mMediaPlayer.reset();
         play();
         return false;
@@ -144,6 +125,7 @@ public class QhMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPla
     public interface OnBeforeStartListener {
         void OnBeforeStart(MediaPlayer var1);
     }
+
     public interface OnAfterStartListener {
         void onAfterStart(MediaPlayer var1);
     }

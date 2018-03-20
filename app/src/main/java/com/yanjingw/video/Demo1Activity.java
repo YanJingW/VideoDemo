@@ -13,8 +13,9 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.yanjingw.video.renderer.QhMediaPlayer;
-import com.yanjingw.video.util.LogUtil;
+import com.yanjingw.video.util.LogUtils;
 import com.yanjingw.video.view.VideoSurfaceView;
+import com.yanjingw.video.view.ViewController;
 
 /**
  * 使用SurfaceView播放一个视频流媒体。
@@ -36,6 +37,7 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
 
     //标记暂停和播放状态
     private boolean isPlaying = true;
+    private ViewController mViewController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
             return;
         }
 
+
         mSurfaceView = findViewById(R.id.surface_view);
         mSurfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
 
@@ -58,6 +61,9 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
         mSurfaceHolder.addCallback(mSurfaceHolderCallback);
 
         qhMediaPlayer = new QhMediaPlayer();
+
+        mViewController = findViewById(R.id.view_controller);
+        mViewController.setVideoPlayer(qhMediaPlayer);
     }
 
 
@@ -65,7 +71,7 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-            LogUtil.i("surfaceDestroyed");
+            LogUtils.i("surfaceDestroyed");
 
             // 销毁SurfaceHolder的时候记录当前的播放位置并停止播放
 //            myMediaPlayer.stop();
@@ -73,17 +79,18 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
             if (qhMediaPlayer != null) {
                 qhMediaPlayer.pause();
             }
+            mViewController.pause();
         }
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
-            LogUtil.i("surfaceCreated");
+            LogUtils.i("surfaceCreated");
+
             qhMediaPlayer.createMediaPlayer(holder);
-            qhMediaPlayer.setVideoPath(videoPath);
             qhMediaPlayer.setOnCompletionListener(new QhMediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer var1) {
-
+                    mViewController.pause();
                 }
             });
             qhMediaPlayer.setOnAfterStartListener(new QhMediaPlayer.OnAfterStartListener() {
@@ -96,14 +103,15 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
                     int videoWidth = qhMediaPlayer.getVideoWidth();
                     int videoHeight = qhMediaPlayer.getVideoHeight();
                     mSurfaceView.fitVideoSize(videoWidth, videoHeight);
+                    mViewController.fitVideoSize(videoWidth, videoHeight);
                 }
             });
-            qhMediaPlayer.play();
+            qhMediaPlayer.setDataSource(videoPath);
         }
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            LogUtil.i("surfaceChanged");
+            LogUtils.i("surfaceChanged");
         }
 
     };
@@ -113,7 +121,7 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        LogUtil.i("onConfigurationChanged");
+        LogUtils.i("onConfigurationChanged");
 
         if (qhMediaPlayer == null) {
             return;
@@ -126,7 +134,13 @@ public class Demo1Activity extends Activity implements MediaPlayer.OnVideoSizeCh
 
     @Override
     public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
-        LogUtil.i("onVideoSizeChanged:::::::");
+        LogUtils.i("onVideoSizeChanged:::::::");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mViewController.destroy();
     }
 
     public static void startActivity(Context context, String videoPath) {
