@@ -187,7 +187,7 @@ public class ViewController extends FrameLayout {
             }
 
             mDisplayTime -= 50;
-            if (mDisplayTime <= 0 && mRootView.getVisibility() == VISIBLE) {
+            if (mDisplayTime <= 0 && mRootView.getVisibility() == VISIBLE && mVideoPlayer.isPlaying()) {
                 mRootView.setVisibility(INVISIBLE);
             }
         }
@@ -207,6 +207,7 @@ public class ViewController extends FrameLayout {
 
     public void pause() {
         controlImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_play));
+        mRootView.setVisibility(VISIBLE);
     }
 
     public interface onPositionChangedListener {
