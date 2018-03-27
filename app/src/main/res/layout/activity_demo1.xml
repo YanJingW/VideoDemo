@@ -6,21 +6,9 @@
     android:layout_height="match_parent"
     tools:context="com.yanjingw.video.Demo1Activity">
 
-
-    <RelativeLayout
+    <com.yanjingw.video.view.PreviewVideoView
+        android:id="@+id/video_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.yanjingw.video.view.PreviewVideoView
-            android:id="@+id/surface_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <com.yanjingw.video.view.ViewController
-            android:id="@+id/view_controller"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </RelativeLayout>
+        android:layout_height="match_parent" />
 
 </android.support.constraint.ConstraintLayout>

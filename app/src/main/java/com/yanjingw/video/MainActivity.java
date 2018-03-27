@@ -16,6 +16,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     File demo1File = new File(FileUtils.ROOT, "demo1.MP4");
     File demo2File = new File(FileUtils.ROOT, "demo1.MP4");
 
+    private final String remoteUrl = "http://svideo.spriteapp.com/video/2016/0703/7b5bc740-4134-11e6-ac2b-d4ae5296039d_wpd.mp4";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.demo1:
                 if (demo1File.exists()) {
                     //文件存在
-                    Demo1Activity.startActivity(MainActivity.this, demo1File.getAbsolutePath());
+//                    Demo1Activity.startActivity(MainActivity.this, demo1File.getAbsolutePath());
+                    Demo1Activity.startActivity(MainActivity.this, remoteUrl);
                 } else {
                     //文件不存在
                     Toast.makeText(MainActivity.this, "示例文件不存在", Toast.LENGTH_SHORT).show();
